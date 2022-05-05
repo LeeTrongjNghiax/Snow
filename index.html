@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+  <style>
+
+    body {
+      overflow: hidden;
+      margin: 0;
+      background-image: url("https://images.wallpapersden.com/image/download/my-winter-4k_bGloameUmZqaraWkpJRmbmdlrWZlbWU.jpg");
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <canvas id="cv"></canvas>
+  
+  <script>
+
+function randomRange(start, stop) {
+  return Math.random() * (stop - start) + start;
+}
+
+class Snow {
+  constructor(position, radius, color, velocity) {
+    this.position = position;
+    this.radius = radius;
+    this.color = color;
+    this.velocity = velocity;
+  }
+  draw() {
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2, true);
+    ctx.fill();
+  }
+  update() {
+    this.draw();
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+  }
+}
+
+let cv = document.querySelector("#cv");
+cv.width = innerWidth;
+cv.height = innerHeight;
+let ctx = cv.getContext("2d");
+
+let snows = [];
+
+const snowPXMin = 0;
+let snowPXMax = innerWidth;
+
+const snowPYMin = 0;
+let snowPYMax = innerHeight;
+
+const snowRMin = 1;
+const snowRMax = 2;
+
+const snowVXMin = -2;
+const snowVXMax = 2;
+
+const snowVYMin = 2;
+const snowVYMax = 4;
+
+const spawnRate = 50;
+
+spawnSnow = () => {
+  setInterval(() => {
+    snows.push(
+      new Snow(
+        {
+          x: randomRange(snowPXMin, snowPXMax),
+          y: -snowRMax
+        },
+        randomRange(snowRMin, snowRMax),
+        `rgba(255, 255, 255, ${randomRange(0.2, 0.8)})`,
+        {
+          x: randomRange(snowVXMin, snowVXMax),
+          y: randomRange(snowVYMin, snowVYMax),
+        },
+      ),
+
+      // new Snow(
+      //   {
+      //     x: -snowRMax,
+      //     y: randomRange(snowPYMin, snowPYMax),
+      //   },
+      //   randomRange(snowRMin, snowRMax),
+      //   `rgba(255, 255, 255, ${randomRange(0.2, 0.8)})`,
+      //   {
+      //     x: randomRange(snowVXMin, snowVXMax),
+      //     y: randomRange(snowVYMin, snowVYMax),
+      //   },
+      // ),
+    );
+  }, spawnRate);
+}
+
+loop = () => {
+  requestAnimationFrame(loop);
+
+  cv.width = innerWidth;
+  cv.height = innerHeight;
+
+  snowPXMax = cv.width;
+  snowPYMax = cv.height;
+
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+  snows.forEach((snow, i) => {
+    snow.update();
+
+    if (snow.position.x >= cv.width ||
+        snow.position.x <= 0 ||
+        snow.position.y >= cv.height) {
+      snows.splice(i, 1);
+    }
+  })
+}
+
+spawnSnow();
+loop();
+
+addEventListener("click", () => {
+  console.log(snows.length);
+})
+
+  </script>
+
+</body>
+
+</html>
